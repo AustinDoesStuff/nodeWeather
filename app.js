@@ -1,4 +1,3 @@
-const request = require('request');
 const yargs = require('yargs');
 const location = require('./location/geolocation');
 const weather = require('./weather/weather');
@@ -16,10 +15,16 @@ const argv = yargs
     .alias('help', 'h')
     .argv;
 
-location.getLocation(argv.address, (errorMessage, results) => {
+location.getLocation(argv.address, (errorMessage, locationResults) => {
     if(errorMessage){
         console.log(errorMessage);
     } else {
-        console.log(JSON.stringify(results, undefined, 2));
+        weather.getWeather(locationResults.lat, locationResults.lon, (errorMessage, weatherResults) => {
+            if(errorMessage){
+                console.log(errorMessage);
+            } else {
+                console.log(`It's ${weatherResults.temp} outside.`);
+            }
+        });
     }
 });
